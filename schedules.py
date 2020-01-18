@@ -22,12 +22,6 @@ def schedule_direct_3d_cuda(inshape, kershape, stride, padding, dilation):
     
     s = tvm.create_schedule(conv.op)
     cfg = autotvm.get_config()
-    print(cfg)
-    print(type(cfg))
-    print("start")
-    print(cfg.index, '\n',cfg.template_key,'\n', cfg._collect, '\n',cfg._entity_map, '\n',cfg._space_map, '\n',cfg._constraints, '\n',cfg.code_hash)
-    print("end")
-    
     
     ##### space definition begin #####
     n, f, d, y, x = s[conv].op.axis
