@@ -11,29 +11,23 @@ def return_sch():
     return schedule_direct_3d_cuda, schedule_conv3d_transpose_nchw_cuda, schedule_conv3d_nchw_cuda
 
 
-LOG_PATH = "/home/weihao_zhuang/Downloads/workspace/auto_log/"
+BEST_LOG = "/home/weihao_zhuang/Downloads/workspace/fast3d/auto_log/best.log"
 def best_functions(dict_value):
     inshape, kershape, outshape, stride, padding, dilation, groups, bias = dict_value
     output_padding = _grad_input_padding(outshape, inshape, stride, padding, kershape[2:])   
 
     #schedult
     inp_sch, inp_g_sch, wei_g_sch = return_sch()
-    #log name
-    fw_log, bw_inp_log, bw_wei_log = return_log_name(dict_value)
-    fw_log = LOG_PATH + fw_log
-    bw_inp_log = LOG_PATH + bw_inp_log 
-    bw_wei_log =  LOG_PATH + bw_wei_log
-    
+
     #forward function
-    func_fw = the_best_config_model(fw_log, inp_sch, (inshape, kershape, stride, padding, dilation))
+    func_fw = the_best_config_model(BEST_LOG, inp_sch, (inshape, kershape, stride, padding, dilation))
     
     #backwrad inp grad function
-    func_inp_g = the_best_config_model(bw_inp_log, inp_g_sch, (outshape, kershape, stride, padding, output_padding, 'float32'))
+    func_inp_g = the_best_config_model(BEST_LOG, inp_g_sch, (outshape, kershape, stride, padding, output_padding, 'float32'))
     
     #backward weight grad function
-    func_wei_g = the_best_config_model(bw_wei_log, wei_g_sch, (reshape_inp_weight_shape(inshape), reshape_inp_weight_shape(outshape),
+    func_wei_g = the_best_config_model(BEST_LOG, wei_g_sch, (reshape_inp_weight_shape(inshape), reshape_inp_weight_shape(outshape),
                                                                dilation, padding, stride, groups))
-    
     return func_fw, func_inp_g, func_wei_g
 
 def best_pytorch_func(data_dict):
